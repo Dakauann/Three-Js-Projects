@@ -1,0 +1,22 @@
+{
+  "name": "three-js-projects",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dakauann/Three-Js-Projects.git"
+  },
+  "author": "Dakauann Cavalcante",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Dakauann/Three-Js-Projects/issues"
+  },
+  "homepage": "https://github.com/Dakauann/Three-Js-Projects#readme",
+  "dependencies": {
+    "three": "^0.139.2"
+  }
+}

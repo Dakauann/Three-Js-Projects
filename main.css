@@ -1,9 +1,29 @@
 body {
     margin: 0;
-    height: 100vh;
+    padding: 0;
+    color: white;
 }
 
 canvas {
-    display: block;
+    position: fixed;
+}
+
+.main-content {
+    width: 100%;
+    height: 100%;
     position: absolute;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-title {
+    color: white;
+    text-align: center;
+    justify-content: center;
+}
+
+.page-title a {
+    text-decoration: none;
+    color: white;
+    text-align: center;
 }

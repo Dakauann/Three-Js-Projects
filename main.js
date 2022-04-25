@@ -1,78 +1,109 @@
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+// import '/node_modules/three/build/three.module.js'
+import '/node_modules/three/examples/js/controls/OrbitControls.js'
 
-/* Setting the renderer and the camera position */
-camera.position.z = 10;
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor('#ffffff');
-document.body.appendChild(renderer.domElement);
-
-/* Resizing the canvas based on the windows size while resizing the window */
-window.addEventListener('resize', e => {
+function sendPageContent() {
+    /* Setting up scene renderer and camera */
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({
+        canvas: document.querySelector('.multiDimensionBackground')
+    });
+    /* Setting up renderer configurations */
     renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-})
+    renderer.setPixelRatio(window.devicePixelRatio);
+    
+    /* Setting up camera position */
+    camera.position.z = window.innerwidth > 300 ? 6.5 : 8;
+    
+    const light = new THREE.PointLight(0xffffff, 1, 1000);
+    light.position.set(0, 5, 0);
+    light.rotation.set(0, 0, 0);
+    scene.add(light);
+    
+    const light2 = light.clone();
+    scene.add(light2)
 
-let raycaster = new THREE.Raycaster();
-let mouse = new THREE.Vector2();
+    const TetrahedronGeometry = new THREE.TetrahedronGeometry(3, 9);
+    const TetrahedronMaterial = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        wireframe: true,
+    })
 
-function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
+    const Tetrahedron = new THREE.Mesh(TetrahedronGeometry, TetrahedronMaterial);
+    scene.add(Tetrahedron);
+
+    const sphereGeometry = new THREE.SphereGeometry(2, 42, 32);
+    const sphereMaterial = new THREE.MeshLambertMaterial({
+        color: 0xffffff,
+        wireframe: true
+    });
+
+    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    sphere.position.set(0, 0, 0);
+    scene.add(sphere);
+
+    const gridHelper = new THREE.GridHelper(10, 10);
+    scene.add(gridHelper);
+    const lightHelper = new THREE.PointLightHelper(light, 1);
+    // scene.add(lightHelper);
+
+    // const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    // controls.update();
+
+    const TweenMax = new TimelineMax().delay(.3)
+    // TweenMax.to(Tetrahedron.rotation, 100, {y: 200})
+
+    for (var i = 0; i < 1000; i++) {
+        // set random stars on the scene
+        const starGeometry = new THREE.SphereGeometry(0.05, 32, 32);
+        const starMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            wireframe: true
+        });
+        const starMesh = new THREE.Mesh(starGeometry, starMaterial);
+        starMesh.position.set(
+            Math.random() * (-60 - 50) + 50,
+            Math.random() * (-60 - 50) + 50,
+            Math.random() * (-60 - 50) + 50
+        );
+        starMesh.side = THREE.FrontSide;
+        scene.add(starMesh);
     }
-    return color;
-}
 
-/* Creating and adding a cube to the scene */
-for (var i = 0; i < 500; i++) {
-let cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-let cubeMaterial = new THREE.MeshLambertMaterial({ color: getRandomColor() });
-let cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-cube.position.x = Math.floor(Math.random() * 20) - 10;
-cube.position.y = Math.floor(Math.random() * 15) - 5;
-cube.position.z = Math.floor(Math.random() * 10) - 5;
-cube.rotation.set(0, -2, -1);
-cube.scale.set(2, 2, 2);
+    function animate() {
+        Tetrahedron.rotation.x += 0.01;
+        Tetrahedron.rotation.y += -0.01;
+        
+        light.position.x = Math.sin(Tetrahedron.rotation.x) * 5;
+        light.position.y = Math.cos(Tetrahedron.rotation.y) * 5;
+        light.position.z = Math.cos(Tetrahedron.position.z) * 5;
+        
+        light2.position.x = -Math.sin(Tetrahedron.rotation.x) * 5;
+        light2.position.y = -Math.cos(Tetrahedron.rotation.y) * 5;
+        light2.position.z = -Math.cos(Tetrahedron.position.z) * 5;
+        
+        // camera.position.set(Math.sin(Tetrahedron.rotation.x) * 4, Math.cos(Tetrahedron.rotation.y) * 4, Math.cos(Tetrahedron.position.z) * 3)
+        // camera.lookAt(Tetrahedron.position)
 
-scene.add(cube)
-}
-
-/* Setting the scene light */
-let light = new THREE.PointLight('white', 1.2, 25);
-light.position.set(0, 0, 10);
-scene.add(light);
-
-/* Updating the scene */
-let render = () => {
-    requestAnimationFrame(render);
-    renderer.render(scene, camera);
-}
-
-render()
-
-window.addEventListener('mousemove', e => {
-    e.preventDefault()
-    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, camera);
-    let intersects = raycaster.intersectObjects(scene.children);
-    // intersects.object.material.color.set('#ff0000');
-    for (let i = 0; i < intersects.length; i++) {
-        if (intersects[0].object) {
-            intersects[0].object.material.color.set(getRandomColor());
-            this.tl = new TimelineMax().delay(.1)
-            this.tl.to(intersects[0].object.position, 1, { x: window.innerWidth / 100, ease: Power2.easeInOut });
-            this.tl.to(intersects[0].object.position, 1, { x: -window.innerWidth / 100, ease: Power2.easeInOut });
-            this.tl.to(intersects[0].object.position, 1, { x: 0, ease: Power2.easeInOut });
-            this.tl.to(intersects[0].object.position, 1, { y: window.innerHeight / 100, ease: Power2.easeInOut });
-            this.tl.to(intersects[0].object.position, 1, { y: -window.innerHeight / 100, ease: Power2.easeInOut });
-            this.tl.to(intersects[0].object.position, 1, { y: 0, ease: Power2.easeInOut });
-        }
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
     }
-})
+    animate();
+    
+    /* Setting up event listener for window resize */
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    })
 
+
+    document.addEventListener('scroll', e => {
+        let top = document.body.getBoundingClientRect().top;
+        top = Math.floor(top / 6)
+        // camera.position.z = 10 - (top / 2 / 2);
+        // console.log(10 - (top / 2 / 2))
+    })
+}
+
+document.onload = sendPageContent()
