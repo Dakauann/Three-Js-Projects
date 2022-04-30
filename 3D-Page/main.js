@@ -75,7 +75,7 @@ const Jupiter = new THREE.Mesh(new THREE.SphereGeometry(5, 32, 32), new THREE.Me
 Jupiter.position.set(0, 0, 0);
 scene.add(Jupiter);
 
-const spotLight = new THREE.SpotLight( 0xffffff, 4, 250, 300, 0, 1 );
+const spotLight = new THREE.SpotLight( 0xffffff, 5, 300, 300, 0, 1 );
 spotLight.position.set( 0, 100, 0 );
 
 scene.add( spotLight );
@@ -83,7 +83,8 @@ scene.add( spotLight );
 // let SpotLightHelper = new THREE.SpotLightHelper(spotLight);
 // scene.add(SpotLightHelper);
 
-let controls = new THREE.OrbitControls(Camera, renderer.domElement);
+// let controls = new THREE.OrbitControls(Camera, renderer.domElement);
+let TweenMax = new TimelineMax().delay(.1);
 
 const render = () => {
     requestAnimationFrame(render);
